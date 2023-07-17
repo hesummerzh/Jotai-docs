@@ -194,3 +194,73 @@ const App = () => (
 
 export default App
 ```
+# useAtom
+
+`useAtom`钩子是读取状态中的原子值。状态可以看作是原子配置和原子值的弱映射。
+
+`useAtom`钩子以元组的形式返回原子值和更新函数，就像 React 的`useState`一样。它需要一个用 `atom()`创建原子配置。
+
+初始状态下，原子没有相关值。只有通过 `useAtom` 使用原子后，初始值才会存储在状态中。如果原子是派生原子，则调用读取函数计算初始值。当原子不再被使用时，即所有使用原子的组件都已卸载，原子配置也不复存在，状态中的值将被垃圾回收。
+
+```const [value, setValue] = useAtom(anAtom)```
+
+`setValue`只接受一个参数，该参数将传递给原子写入函数的第三个参数。行为取决于写入函数的实现方式。
+
+>注意：
+>如 atom 部分所述，您必须注意处理 atom 的引用，否则可能会进入无限循环
+```
+const stableAtom = atom(0)
+const Component = () => {
+  const [atomValue] = useAtom(atom(0)) // 这将导致无限循环
+  const [atomValue] = useAtom(stableAtom) // This is fine
+  const [derivedAtomValue] = useAtom(
+    useMemo(
+      // This is also fine
+      () => atom((get) => get(stableAtom) * 2),
+      []
+    )
+  )
+}
+```
+>请记住，React负责调用您的组件。这意味着它必须是幂等的，可以被多次调用。即使没有道具或原子发生变化，您也会经常看到额外的重新渲染。没有提交的额外重新渲染是一种预期行为。它实际上是React 18中useReducer的默认行为。
+
+## 特性
+```
+// primitive or writable derived atom
+function useAtom<Value, Update>(
+  atom: WritableAtom<Value, Update>,
+  options?: { store?: Store }
+): [Value, SetAtom<Update>]
+
+// read-only atom
+function useAtom<Value>(
+  atom: Atom<Value>,
+  options?: { store?: Store }
+): [Value, never]
+```
+useAtom 钩子用于读取存储在提供程序中的原子值。它以元组的形式返回原子值和更新函数，就像 useState 一样。它需要一个使用 创建的原子配置。最初，提供程序中不存储任何值。第一次通过 使用 `useAtom` 时，它将在提供程序中添加一个初始值。如果原子是派生原子，则执行读取函数以计算初始值。当不再使用原子时，这意味着卸载使用它的所有组件，并且原子配置不再存在，该值将从提供程序中删除。
+
+```const [value, setValue] = useAtom(anAtom)```
+
+`setValue`需要一个参数，该参数将被传递给原子的 writeFunction 的第三个参数。行为取决于 writeFunction 的实现方式。
+
+### 原子依赖如何工作 
+
+首先，让我们解释一下。在当前的实现中，每次调用“read”函数时，我们都会刷新依赖项和依赖项。例如，如果 A 依赖于 B，则表示 B 是 A 的依赖关系，A 是 B 的依赖关系。
+
+```const uppercaseAtom = atom((get) => get(textAtom).toUpperCase())```
+
+读取函数是原子的第一个参数。依赖项最初将为空。第一次使用时，我们运行读取函数并知道`uppercaseAtom`取决于`textAtom`,`textAtom`依赖于`uppercaseAtom`。因此，`uppercaseAtom`添加到`textAtom`的依赖项中。当我们重新运行 read 函数时（因为它的依赖项`textAtom`已更新），将再次创建依赖项，在这种情况下是相同的。然后，我们删除过时的依赖项并替换为最新的依赖项。
+
+### 原子可以按需创建
+
+虽然这里的基本示例显示了在组件之外全局定义原子，但对于我们可以在何时何地创建原子没有任何限制。只要我们记住原子是由它们的对象参照身份标识的，我们就可以随时创建它们。
+
+如果在渲染函数中创建原子，则通常需要使用类似`useRef` 或`useMemo`用于记忆的钩子。否则，每次组件呈现时都会重新创建原子。
+
+您可以创建一个原子并将其与另一个原子用`useState`一起存储，甚至可以存储在另一个原子中。请参阅[问题 #5 ](https://github.com/pmndrs/jotai/issues/5)中的示例。
+
+您可以将原子缓存在全局的某个位置。请参阅此[示例](https://twitter.com/dai_shi/status/1317653548314718208)或[该示例](https://github.com/pmndrs/jotai/issues/119#issuecomment-706046321)。
+
+
+
