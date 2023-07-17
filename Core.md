@@ -12,3 +12,10 @@ const priceAtom = atom(10)
 const messageAtom = atom('hello')
 const productAtom = atom({ id: 12, name: 'good stuff' })
 ```
+
+您还可以创建派生原子。我们有三种模式：
+
+- Read-only atom 只读原子 
+- Write-only atom 只写原子 
+- Read-Write atom 读写原子 
+为了创建派生原子，我们传递一个读取函数和一个可选的写入函数。
