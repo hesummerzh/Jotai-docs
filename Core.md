@@ -94,4 +94,17 @@ const derivedAtomWithWriteOnly = atom(null, write)
 >note
 >虽然调试标签不必是唯一的，但通常建议使它们可区分。
 
+## `onMount`属性
+
+创建的原子配置可以具有可选属性`onMount`。 `onMount`是一个函数，它接收`setAtom`函数并返回`onUnmount`函数。
+
+该函数`onMount`在提供程序中首次使用 `atom` 时调用，在不再使用时调用。在某些边缘情况下，可以卸载原子，然后立即安装。
+```
+const anAtom = atom(1)
+anAtom.onMount = (setAtom) => {
+  console.log('atom is mounted in provider')
+  setAtom(c => c + 1) // increment count on mount
+  return () => { ... } // return optional onUnmount function
+}
+```
   
