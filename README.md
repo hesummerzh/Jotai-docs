@@ -12,7 +12,7 @@
 
 ## 目录
 
-- [Basics 基本用法](./Basics.md)
+- [Core 核心](./Basics.md)
   - [Motivation 动机](./Basics.md#动机)
   - [Installation 安装](./Basics.md#安装)
   - [Getting Started 入门](./Basics.md#入门)
