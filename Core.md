@@ -78,4 +78,20 @@ function atom<Value, Update>(
 - `initialValue`: 原子在其值更改之前将返回的初始值。
 - `read`: 是每次重新渲染时都会调用的函数。`read`的签名是`(get) => Value | Promise<Value>`，`get`是一个接收原子配置并返回其存储在Provider中的值的函数，如下所述。依赖关系会被跟踪，因此如果`get`至少被用于一个原子一次，那么只要原子值发生变化，`read`就会被重新评估。
 - `write`: 为了更好地描述，`useAtom()[1]`是一个主要用于修改原子值的函数，每当我们调用 `useAtom()[1]` 返回值的第二个值时，它就会被调用。该函数在原始原子中的默认值将改变该原子的值。`write` 的签名是 `(get, set, update) => void | Promise<void>`。`get` 与上面描述的签名类似，但它不跟踪依赖关系。`set`是一个函数，它接收一个原子配置和一个新值，然后更新Provider中的原子值。
+
+```
+const primitiveAtom = atom(initialValue)
+const derivedAtomWithRead = atom(read)
+const derivedAtomWithReadWrite = atom(read, write)
+const derivedAtomWithWriteOnly = atom(null, write)
+```
+
+有两种原子：可写原子和只读原子。原始原子总是可写的。如果指定了 ，则派生原子是可写的。原始原子的等价于`React.useState`的`setState`.
+
+## `debugLabel`属性 
+创建的原子配置可以具有可选属性。调试标签用于在调试中显示原子。有关详细信息，请参阅[<u>调试指南</u>](https://jotai.org/docs/guides/debugging)。
+
+>note
+>虽然调试标签不必是唯一的，但通常建议使它们可区分。
+
   
