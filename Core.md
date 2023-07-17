@@ -17,5 +17,25 @@ const productAtom = atom({ id: 12, name: 'good stuff' })
 
 - Read-only atom 只读原子 
 - Write-only atom 只写原子 
-- Read-Write atom 读写原子 
+- Read-Write atom 读写原子
+   
 为了创建派生原子，我们传递一个读取函数和一个可选的写入函数。
+
+```
+const readOnlyAtom = atom((get) => get(priceAtom) * 2)
+const writeOnlyAtom = atom(
+  null, // 通常第一个参数为`null`
+  (get, set, update) => {
+    // update 是我们收到的用于更新该原子的任何单个值
+    set(priceAtom, get(priceAtom) - update.discount)
+  }
+)
+const readWriteAtom = atom(
+  (get) => get(priceAtom) * 2,
+  (get, set, newPrice) => {
+    set(priceAtom, newPrice / 2)
+    // 可同时设置多个原子
+  }
+)
+
+```
