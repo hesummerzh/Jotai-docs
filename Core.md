@@ -130,20 +130,67 @@ derivedAtom.onMount = (setAtom) => {
 
 ### `options.signal`
 
-它使用[<u>AbortController<u/>](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)，以便您可以中止异步函数。中止在启动新计算（调用`read`函数）之前触发。
+它使用[<u>AbortController<u/>](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)，因此您可以中止异步函数。中止在启动新计算（调用`read`函数）之前触发。
 
 如何使用它： 
 ```
 const readOnlyDerivedAtom = atom(async (get, { signal }) => {
-  // use signal to abort your function
+  // 使用信号中止函数
 })
 
 const writableDerivedAtom = atom(
   async (get, { signal }) => {
-    // use signal to abort your function
+    // 使用信号中止函数
   },
   (get, set, arg) => {
     // ...
   }
 )
+```
+`signal`值为[<u>AbortController<u/>](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)。您可以检查布尔值，或使用`abort`事件`addEventListener`。
+
+对于`fetch`用例，我们可以简单地通过`signal`.
+
+有关用法，请参阅以下`fetch`示例。
+
+```
+import { Suspense } from 'react'
+import { atom, useAtom } from 'jotai'
+
+const userIdAtom = atom(1)
+const userAtom = atom(async (get, { signal }) => {
+  const userId = get(userIdAtom)
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/users/${userId}?_delay=2000`,
+    { signal }
+  )
+  return response.json()
+})
+
+const Controls = () => {
+  const [userId, setUserId] = useAtom(userIdAtom)
+  return (
+    <div>
+      User Id: {userId}
+      <button onClick={() => setUserId((c) => c - 1)}>Prev</button>
+      <button onClick={() => setUserId((c) => c + 1)}>Next</button>
+    </div>
+  )
+}
+
+const UserName = () => {
+  const [user] = useAtom(userAtom)
+  return <div>User name: {user.name}</div>
+}
+
+const App = () => (
+  <>
+    <Controls />
+    <Suspense fallback="Loading...">
+      <UserName />
+    </Suspense>
+  </>
+)
+
+export default App
 ```
