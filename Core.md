@@ -262,5 +262,65 @@ useAtom 钩子用于读取存储在提供程序中的原子值。它以元组的
 
 您可以将原子缓存在全局的某个位置。请参阅此[示例](https://twitter.com/dai_shi/status/1317653548314718208)或[该示例](https://github.com/pmndrs/jotai/issues/119#issuecomment-706046321)。
 
+## useAtomValue 
+
+```const countAtom = atom(0)
+
+const Counter = () => {
+  const setCount = useSetAtom(countAtom)
+  const count = useAtomValue(countAtom)
+
+  return (
+    <>
+      <div>count: {count}</div>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </>
+  )
+}
+```
+与`useSetAtom`钩子类似，`useAtomValue`允许您访问只读原子。
+
+## useSetAtom 
+```
+const switchAtom = atom(false)
+
+const SetTrueButton = () => {
+  const setCount = useSetAtom(switchAtom)
+  const setTrue = () => setCount(true)
+
+  return (
+    <div>
+      <button onClick={setTrue}>Set True</button>
+    </div>
+  )
+}
+
+const SetFalseButton = () => {
+  const setCount = useSetAtom(switchAtom)
+  const setFalse = () => setCount(false)
+
+  return (
+    <div>
+      <button onClick={setFalse}>Set False</button>
+    </div>
+  )
+}
+
+export default function App() {
+  const state = useAtomValue(switchAtom)
+
+  return (
+    <div>
+      State: <b>{state.toString()}</b>
+      <SetTrueButton />
+      <SetFalseButton />
+    </div>
+  )
+}
+```
+如果您需要在不读取原子的情况下更新原子的值，您可以使用`useSetAtom()`
+当需要考虑性能问题时，这一点尤其有用，因为`const [, setValue] = useAtom(valueAtom)`会在每次`valueAtom`更新时引起不必要的重新显示.
+
+# Store
 
 
