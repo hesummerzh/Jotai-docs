@@ -48,4 +48,34 @@ const readWriteAtom = atom(
 
 ### 关于在渲染函数中创建原子的注意事项
 可以在任何地方创建原子配置，但是参考平等很重要。它们也可以动态创建。要创建渲染函数的原子，需要useMemo或useref才能获得稳定的参考。如果对使用useMemo或useRef进行记忆有疑问，请使用useMemo。否则，它可能会引起无限循环.
+```
+const Component = ({ value }) => {
+  const valueAtom = useMemo(() => atom({ value }), [value])
+  // ...
+}
+```
+## Signatures 
 
+```
+// primitive atom
+function atom<Value>(initialValue: Value): PrimitiveAtom<Value>
+
+// read-only atom
+function atom<Value>(read: (get: Getter) => Value | Promise<Value>): Atom<Value>
+
+// writable derived atom
+function atom<Value, Update>(
+  read: (get: Getter) => Value | Promise<Value>,
+  write: (get: Getter, set: Setter, update: Update) => void | Promise<void>
+): WritableAtom<Value, Update>
+
+// write-only derived atom
+function atom<Value, Update>(
+  read: Value,
+  write: (get: Getter, set: Setter, update: Update) => void | Promise<void>
+): WritableAtom<Value, Update>
+```
+- `initialValue`: 原子在其值更改之前将返回的初始值。
+- `read`: 是每次重新渲染时都会调用的函数。`read`的签名是`(get) => Value | Promise<Value>`，`get`是一个接收原子配置并返回其存储在Provider中的值的函数，如下所述。依赖关系会被跟踪，因此如果`get`至少被用于一个原子一次，那么只要原子值发生变化，`read`就会被重新评估。
+- `write`: 为了更好地描述，`useAtom()[1]`是一个主要用于修改原子值的函数，每当我们调用 `useAtom()[1]` 返回值的第二个值时，它就会被调用。该函数在原始原子中的默认值将改变该原子的值。`write` 的签名是 `(get, set, update) => void | Promise<void>`。`get` 与上面描述的签名类似，但它不跟踪依赖关系。`set`是一个函数，它接收一个原子配置和一个新值，然后更新Provider中的原子值。
+  
