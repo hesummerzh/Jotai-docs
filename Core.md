@@ -323,4 +323,30 @@ export default function App() {
 
 # Store
 
+## createStore 
+
+此函数用于创建新的空存储。存储可用于传入Provider 。
+
+存储有三种方法：获取原子值、设置原子值和订阅原子更改。
+
+```const myStore = createStore()
+
+const countAtom = atom(0)
+myStore.set(countAtom, 1)
+const unsub = myStore.sub(countAtom, () => {
+  console.log('countAtom value is changed to', myStore.get(countAtom))
+})
+// unsub() to unsubscribe
+
+const Root = () => (
+  <Provider store={myStore}>
+    <App />
+  </Provider>
+)
+```
+##getDefaultStore 
+
+此函数返回在无提供程序模式下使用的默认存储。
+
+```const defaultStore = getDefaultStore()```
 
