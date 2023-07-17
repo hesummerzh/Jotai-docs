@@ -107,4 +107,43 @@ anAtom.onMount = (setAtom) => {
   return () => { ... } // return optional onUnmount function
 }
 ```
-  
+
+调用函数`setAtom`将调用原子的`write`.自定义`write`允许更改行为。
+
+```const countAtom = atom(1)
+const derivedAtom = atom(
+  (get) => get(countAtom),
+  (get, set, action) => {
+    if (action.type === 'init') {
+      set(countAtom, 10)
+    } else if (action.type === 'inc') {
+      set(countAtom, (c) => c + 1)
+    }
+  }
+)
+derivedAtom.onMount = (setAtom) => {
+  setAtom({ type: 'init' })
+}
+```
+## 高级接口 <div id="Advanced"/>
+自Jotai v2以来，`read`函数具有第二个参数。
+
+### `options.signal`
+
+它使用[<u>AbortController<u/>](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)，以便您可以中止异步函数。中止在启动新计算（调用`read`函数）之前触发。
+
+如何使用它： 
+```
+const readOnlyDerivedAtom = atom(async (get, { signal }) => {
+  // use signal to abort your function
+})
+
+const writableDerivedAtom = atom(
+  async (get, { signal }) => {
+    // use signal to abort your function
+  },
+  (get, set, arg) => {
+    // ...
+  }
+)
+```
