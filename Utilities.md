@@ -1,6 +1,7 @@
 # Storage
 ## atomWithStorage
 Ref: [https://github.com/pmndrs/jotai/pull/394](https://github.com/pmndrs/jotai/pull/394)
+
 `atomWithStorage`函数为React创建一个原子`localStorage`或`sessionStorage`，为React Native创建一个原子`AsyncStorage`。
 参数
 **key（必填）**：唯一字符串，在与localStorage、sessionStorage或AsyncStorage同步状态时用作密钥。
