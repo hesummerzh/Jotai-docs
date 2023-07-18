@@ -136,3 +136,44 @@ const storedNumberAtom = atomWithStorage('my-number', 0, {
   },
 })
 ```
+
+# SSR
+## useHydrateAtoms
+Ref: [https://github.com/pmndrs/jotai/issues/340](https://github.com/pmndrs/jotai/issues/340)
+```
+import { atom, useAtom } from 'jotai'
+import { useHydrateAtoms } from 'jotai/utils'
+
+const countAtom = atom(0)
+const CounterPage = ({ countFromServer }) => {
+  useHydrateAtoms([[countAtom, countFromServer]])
+  const [count] = useAtom(countAtom)
+  // count would be the value of `countFromServer`, not 0.
+}
+```
+
+useHydrateAtoms 的主要用例是 Next.js 等 SSR 应用程序，在这些应用程序中，初始值会在服务器上获取，并通过prop传递给组件。
+
+```
+// Definition
+function useHydrateAtoms(
+  values: Iterable<readonly [Atom<unknown>, unknown]>,
+  options?: { store?: Store }
+): void
+```
+
+钩子以包含 [atom, value] 的可迭代元组为参数，包括可选选项
+
+```
+// Usage with an array, specifying a store
+useHydrateAtoms(
+  [
+    [countAtom, 42],
+    [frameworkAtom, 'Next.js'],
+  ],
+  { store: myStore }
+)
+// Or with a map
+useHydrateAtoms(new Map([[count, 42]]))
+```
+
