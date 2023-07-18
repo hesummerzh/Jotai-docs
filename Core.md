@@ -194,7 +194,7 @@ const App = () => (
 
 export default App
 ```
-# useAtom
+# useAtom<div id="useAtom"/>
 
 `useAtom`钩子是读取状态中的原子值。状态可以看作是原子配置和原子值的弱映射。
 
@@ -262,7 +262,7 @@ useAtom 钩子用于读取存储在提供程序中的原子值。它以元组的
 
 您可以将原子缓存在全局的某个位置。请参阅此[示例](https://twitter.com/dai_shi/status/1317653548314718208)或[该示例](https://github.com/pmndrs/jotai/issues/119#issuecomment-706046321)。
 
-## useAtomValue 
+## useAtomValue<div id="useAtomValue"/> 
 
 ```const countAtom = atom(0)
 
@@ -280,7 +280,7 @@ const Counter = () => {
 ```
 与`useSetAtom`钩子类似，`useAtomValue`允许您访问只读原子。
 
-## useSetAtom 
+## useSetAtom <div id="useSetAtom"/> 
 ```
 const switchAtom = atom(false)
 
@@ -323,7 +323,7 @@ export default function App() {
 
 # Store
 
-## createStore 
+## createStore <div id="createStore"/> 
 
 此函数用于创建新的空存储。存储可用于传入Provider 。
 
@@ -344,9 +344,22 @@ const Root = () => (
   </Provider>
 )
 ```
-##getDefaultStore 
+## getDefaultStore <div id="getDefaultStore"/> 
 
 此函数返回在无提供程序模式下使用的默认存储。
 
 ```const defaultStore = getDefaultStore()```
 
+# Provider
+
+## Provider <div id="Provider"/> 
+
+`Provider`组件是为组件子树提供状态。多个提供程序可用于多个子树，甚至可以嵌套它们。这就像 `React Context` 一样工作。
+
+如果在没有提供程序的树中使用原子，它将使用默认状态。这就是所谓的无提供程序模式。
+
+Providers很有用，原因有三：
+
+1. 为每个子树提供不同的状态。
+2. 接受atoms的初始值。
+3. 通过重新安装清除所有atoms。
