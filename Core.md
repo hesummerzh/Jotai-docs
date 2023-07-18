@@ -363,3 +363,49 @@ Providers很有用，原因有三：
 1. 为每个子树提供不同的状态。
 2. 接受atoms的初始值。
 3. 通过重新安装清除所有atoms。
+
+```
+const SubTree = () => (
+  <Provider>
+    <Child />
+  </Provider>
+)
+```
+## Signatures 
+
+```const Provider: React.FC<{
+  store?: Store
+}>```
+
+Atom 配置不保存值。原子值位于单独的存储空间中。Provider是一个组件，它包含一个存储，并在组件树下提供原子值。Provider的工作方式类似于React上下文提供者。如果您不使用Provider，它就会以默认存储空间的无Provider模式工作。如果我们需要为不同的组件树保存不同的原子值，那么Provider就是必要的。Provider可以使用一个可选的道具存储空间`Store`.
+
+```
+const Root = () => (
+  <Provider>
+    <App />
+  </Provider>
+)
+```
+###`store`Prop
+
+Provider接受一个可选的prop存储空间，您可以将其用于Provider子树。
+
+```
+const myStore = createStore()
+
+const Root = () => (
+  <Provider store={myStore}>
+    <App />
+  </Provider>
+)
+```
+## useStore
+
+此挂钩返回组件树中的存储区。
+```
+const Component = () => {
+  const store = useStore()
+  // ...
+}
+```
+
