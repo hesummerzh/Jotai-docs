@@ -176,4 +176,20 @@ useHydrateAtoms(
 // Or with a map
 useHydrateAtoms(new Map([[count, 42]]))
 ```
+原子（Atom）只能在存储中被水合一次。因此，如果在重新渲染期间更改了使用的初始值，则不会更新原子值。如果有一个独特的需要重新水合先前水合的原子，请将可选的`dangerouslyForceHydrate`传递为true，并注意它可能在并发渲染中表现不正确。
+
+```
+useHydrateAtoms(
+  [
+    [countAtom, 42],
+    [frameworkAtom, 'Next.js'],
+  ],
+  {
+    dangerouslyForceHydrate: true,
+  }
+)
+```
+**水合**:
+在React中，水合（Hydration）是指将服务器渲染的HTML内容转化为可交互的页面的过程。在这个过程中，React会将HTML元素与客户端JavaScript代码关联起来，以便能够在页面上进行交互。在使用React进行服务器渲染时，水合通常是必需的，以确保页面在客户端上正确呈现。
+
 
