@@ -1,5 +1,5 @@
-# Storage
-## atomWithStorage
+# Storage <div id="Storage"/>
+## atomWithStorage <div id="atomWithStorage"/>
 Ref: [https://github.com/pmndrs/jotai/pull/394](https://github.com/pmndrs/jotai/pull/394)
 
 `atomWithStorage`函数为React创建一个原子`localStorage`或`sessionStorage`，为React Native创建一个原子`AsyncStorage`。
@@ -65,7 +65,7 @@ const TextBox = () => {
   )
 }
 ```
-### React-Native实现
+### React-Native实现 <div id="React-Native"/>
 
 您可以使用任何实现`getItem`、`setItem`和`removeItem`的库。比方说，您可以使用社区提供的标准`AsyncStorage`
 
@@ -137,8 +137,8 @@ const storedNumberAtom = atomWithStorage('my-number', 0, {
 })
 ```
 
-# SSR
-## useHydrateAtoms
+# SSR <div id="SSR"/>
+## useHydrateAtoms <div id="useHydrateAtoms"/>
 Ref: [https://github.com/pmndrs/jotai/issues/340](https://github.com/pmndrs/jotai/issues/340)
 ```
 import { atom, useAtom } from 'jotai'
@@ -191,5 +191,62 @@ useHydrateAtoms(
 ```
 **水合**:
 在React中，水合（Hydration）是指将服务器渲染的HTML内容转化为可交互的页面的过程。在这个过程中，React会将HTML元素与客户端JavaScript代码关联起来，以便能够在页面上进行交互。在使用React进行服务器渲染时，水合通常是必需的，以确保页面在客户端上正确呈现。
+
+# Async <div id="Async"/>
+
+所有原子都支持异步行为，如异步读取或异步写入。不过，这里介绍的应用程序接口可以实现更多控制.
+
+## 可加载
+
+如果不想让异步原子暂停或抛出错误边界（例如，为了更精细地控制加载和出错逻辑），可以使用 loadable 工具。
+它对任何原子的作用都是一样的。只需用 loadable 对原子进行包装即可。它会返回一个具有三种状态之一的值：`loading`、`hasData` 和 `hasError`.
+
+```
+{
+    state: 'loading' | 'hasData' | 'hasError',
+    data?: any,
+    error?: any,
+}
+```
+
+```
+import { loadable } from "jotai/utils"
+
+const asyncAtom = atom(async (get) => ...)
+const loadableAtom = loadable(asyncAtom)
+// Does not need to be wrapped by a <Suspense> element
+const Component = () => {
+  const [value] = useAtom(loadableAtom)
+  if (value.state === 'hasError') return <Text>{value.error}</Text>
+  if (value.state === 'loading') {
+    return <Text>Loading...</Text>
+  }
+  console.log(value.data) // Results of the Promise
+  return <Text>Value: {value.data}</Text>
+}
+```
+
+## atomWithObservable <div id="atomWithObservable"/>
+
+Ref: [https://github.com/pmndrs/jotai/pull/341](https://github.com/pmndrs/jotai/pull/341)
+
+### 使用方法
+```
+import { useAtom } from 'jotai'
+import { atomWithObservable } from 'jotai/utils'
+import { interval } from 'rxjs'
+import { map } from 'rxjs/operators'
+
+const counterSubject = interval(1000).pipe(map((i) => `#${i}`))
+const counterAtom = atomWithObservable(() => counterSubject)
+
+const Counter = () => {
+  const [counter] = useAtom(counterAtom)
+  return <div>count: {counter}</div>
+}
+```
+
+
+
 
 
